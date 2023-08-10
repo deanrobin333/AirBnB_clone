@@ -7,7 +7,7 @@ from models.base_model import BaseModel
 class HBNBCommand(cmd.Cmd):
     """ General Class for HBNBCommand """
     prompt = '(hbnb) '
-    dic_class = {'BaseModel': BaseModel}
+    classes = {'BaseModel': BaseModel}
 
     def do_quit(self, arg):
         """ Exit method for quit typing """
