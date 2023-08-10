@@ -16,7 +16,7 @@ class BaseModel:
         """Returns a string represation of class details."""
         return f'BaseModel({self.id}, {self.__dict__})'
 
-    def save_model(self):
+    def save(self):
         """Update public instance attribute updated_at with current datetime.
         """
         self.updated_at = datetime.datetime.now()
