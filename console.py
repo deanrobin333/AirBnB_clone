@@ -1,22 +1,39 @@
 #!/usr/bin/python3
-""" Entry point of the command interpreter"""
+"""Contains the entry point of the command interpreter.
+
+You must use the module cmd.
+Your class definition must be: class HBNBCommand(cmd.Cmd):
+Your command interpreter should implement:
+quit and EOF to exit the program,
+help (this action is provided by default by cmd but you should keep it
+updated and documented as you work through tasks),
+a custom prompt: (hbnb),
+an empty line + ENTER shouldn’t execute anything.
+Your code should not be executed when imported
+"""
 import cmd
-import shlex
 import models
-from models import storage
 from models.base_model import BaseModel
+from models.__init__ import storage
 from models.user import User
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
+import shlex
 
 
 class HBNBCommand(cmd.Cmd):
-    """ General Class for HBNBCommand """
+    """class for command processor.
+
+    Args:
+        cmd (_type_): _description_
+    """
     prompt = "(hbnb) "
-    classes_list = ["BaseModel", "Model2", "Model2"]
+    classes_list = ["BaseModel", "User", "State", "City", "Amenity",
+                    "Place", "Review"]
+    commands_list = ["create", "show", "all", "destroy", "update", "count"]
 
     def do_quit(self, args):
         """Quit command to exit the program
@@ -36,19 +53,19 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, inp):
         """Creates a new instance of BaseModel, saves it (to the JSON
         file) and prints the id.
+
         Args:
             class_name (class): name of current class.
         """
         args = inp.split()
         if not self.class_verification(args):
             return
+
         inst = eval(str(args[0]) + '()')
         if not isinstance(inst, BaseModel):
             return
-        else:
-            new_model = BaseModel()
-            print(new_model.id)
-            new_model.save()
+        inst.save()
+        print(inst.id)
 
     def do_show(self, inp):
         """Prints the string representation of an instance based on the
@@ -58,6 +75,7 @@ class HBNBCommand(cmd.Cmd):
 
         if not self.class_verification(args):
             return
+
         if not self.id_verification(args):
             return
 
@@ -68,6 +86,7 @@ class HBNBCommand(cmd.Cmd):
     @classmethod
     def class_verification(cls, args):
         """Verifies class and checks if it is in the class list.
+
         Returns:
             bool: True or false depending on status of class.
         """
@@ -84,17 +103,20 @@ class HBNBCommand(cmd.Cmd):
     @staticmethod
     def id_verification(args):
         """Verifies id of class.
+
         Returns:
             bool: True or False depending on status of id.
         """
         if len(args) < 2:
             print("** instance id missing **")
             return False
-        objects = storage.all()
+
+        objects = models.storage.all()
         string_key = str(args[0]) + '.' + str(args[1])
         if string_key not in objects.keys():
             print("** no instance found **")
             return False
+
         return True
 
     def do_destroy(self, inp):
@@ -116,7 +138,7 @@ class HBNBCommand(cmd.Cmd):
         on the class name.
         """
         args = inp.split()
-        all_objects = storage.all()
+        all_objects = models.storage.all()
         list_ = []
         if len(args) == 0:
             # print all classes
@@ -136,23 +158,54 @@ class HBNBCommand(cmd.Cmd):
         """ Updates an instance based on the class name and id by adding or
         updating attribute (save the change into the JSON file).
         """
-        args = shlex.split(line)
+        act = ""
+        for argv in line.split(','):
+            act = act + argv
+        args = shlex.split(act)
         if not self.class_verification(args):
             return
         if not self.id_verification(args):
             return
         if not self.attribute_verification(args):
             return
-        string_key = str(args[0]) + '.' + str(args[1])
-        all_objects = storage.all()
-        my_dict = all_objects[string_key].to_dict()
-        attr_name = args[2]
-        attr_value = args[3]
-        for (key, value) in my_dict.items():
-            if attr_name is key:
-                attr_value = eval('({}){}'.format(type(value), attr_value))
-        setattr(all_objects[string_key], attr_name, attr_value)
-        storage.save()
+        all_objects = models.storage.all()
+        for key, value in all_objects.items():
+            object_name = value.__class__.__name__
+            object_id = value.id
+            if object_name == args[0] and object_id == args[1].strip('"'):
+                if len(args) == 2:
+                    print("** attribute name missing **")
+                elif len(args) == 3:
+                    print("** value missing **")
+                else:
+                    setattr(value, args[2], args[3])
+                    models.storage.save()
+                return
+
+    def precmd(self, arg):
+        """Hook before the command is run.
+        If the self.block_command returns True, the command is not run.
+        Otherwise, it is run.
+        """
+        if '.' in arg and '(' in arg and ')' in arg:
+            cls = arg.split('.')
+            command = cls[1].split('(')
+            args = command[1].split(')')
+            if cls[0] in HBNBCommand.classes_list and command[0] \
+                    in HBNBCommand.commands_list:
+                arg = command[0] + ' ' + cls[0] + ' ' + args[0]
+        return arg
+
+    def do_count(self, class_name):
+        """Retrieve the number of instances of a class.
+        """
+        count = 0
+        all_objects = models.storage.all()
+        for key, value in all_objects.items():
+            keys_split = key.split('.')
+            if keys_split[0] == class_name:
+                count += 1
+        print(count)
 
     @staticmethod
     def attribute_verification(args):
