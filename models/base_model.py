@@ -7,15 +7,28 @@ from datetime import datetime
 
 class BaseModel():
     """ Class that defines properties of base """
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """ Creates new instances of Base """
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = self.created_at
-
-        if kwargs:
+        if not kwargs:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = self.created_at
+        else:
+            time_format = "%Y-%m-%dT%H:%M:%S.%f"
             for key, value in kwargs.items():
-                self.key = value
+                '''created_at and updated_at are strings in this dictionary,
+                but inside BaseModel instance is working with datetime object.
+                You have to convert these strings into datetime object.
+
+                - Allows us to create a BaseModel from another BaseModel
+                by it calling the "to_dict()" method. Eg
+                bm1 = BaseModel()
+                bm2 = BaseModel(**bm1.to_dict())
+                '''
+                if key in ('created_at', 'updated_at'):
+                    self.__dict__[key] = datetime.strptime(value, time_format)
+                else:
+                    self.__dict__[key] = value
 
     def __str__(self):
         """Returns a string represation of class details.
