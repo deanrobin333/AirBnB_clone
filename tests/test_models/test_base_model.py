@@ -52,7 +52,7 @@ class TestBaseModel(unittest.TestCase):
     def test_save(self):
         """Test if save method is working correctly after update.
         """
-        #self.BaseModel1.save()
+        self.BaseModel1.save()
         self.assertNotEqual(self.BaseModel1.created_at,
                             self.BaseModel1.updated_at)
 
