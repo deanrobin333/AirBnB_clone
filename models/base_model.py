@@ -5,7 +5,6 @@ import uuid
 from datetime import datetime
 
 
-
 class BaseModel():
     """ Class that defines properties of base """
     def __init__(self, **kwargs):
@@ -17,7 +16,7 @@ class BaseModel():
         if kwargs:
             for key, value in kwargs.items():
                 self.key = value
-    
+
     def __str__(self):
         """Returns a string represation of class details.
 
@@ -30,8 +29,7 @@ class BaseModel():
         """Update public instance attribute updated_at with current datetime.
         """
         self.updated_at = datetime.now()
-        return self.updated_at
-    
+
     def to_dict(self):
         """Returns a dictionary containing all key/values of __dict__ of
         the instance.
