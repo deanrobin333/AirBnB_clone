@@ -16,7 +16,7 @@ class BaseModel():
             # datetime.now(timezone.utc) - better timezone
             #  - from datetime import timezone
             self.created_at = datetime.utcnow()
-            self.updated_at = self.created_at
+            self.updated_at = datetime.utcnow()
             '''Add the new when created object'''
             models.storage.new(self)
         else:
