@@ -46,10 +46,10 @@ class FileStorage():
         """
         dictionary = {}
 
-        for key, value in FileStorage.__objects.items():
+        for key, value in self.__objects.items():
             dictionary[key] = value.to_dict()
 
-        with open(FileStorage.__file_path, 'w', encoding="utf-8") as myFile:
+        with open(self.__file_path, 'w', encoding="utf-8") as myFile:
             json.dump(dictionary, myFile)
 
     def reload(self):
@@ -59,6 +59,7 @@ class FileStorage():
         """
         try:
             with open(self.__file_path, 'r', encoding='utf-8') as myFile:
+                # my_obj_dump = myFile.read()
                 my_obj_dump = myFile.read()
         except Exception:
             return
