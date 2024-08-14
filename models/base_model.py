@@ -2,7 +2,7 @@
 # base_mode.py
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 import models
 
 
@@ -13,7 +13,9 @@ class BaseModel():
         if not kwargs:
             self.id = str(uuid.uuid4())
             # datetime.utcnow() has been depracated
-            self.created_at = datetime.now(timezone.utc)
+            # datetime.now(timezone.utc) - better timezone
+            #  - from datetime import timezone
+            self.created_at = datetime.utcnow()
             self.updated_at = self.created_at
             '''Add the new when created object'''
             models.storage.new(self)
