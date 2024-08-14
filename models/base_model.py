@@ -15,8 +15,8 @@ class BaseModel():
             # datetime.utcnow() has been depracated
             # datetime.now(timezone.utc) - better timezone
             #  - from datetime import timezone
-            self.created_at = datetime.utcnow()
-            self.updated_at = datetime.utcnow()
+            self.created_at = datetime.today()
+            self.updated_at = datetime.today()
             '''Add the new when created object'''
             models.storage.new(self)
         else:
@@ -47,7 +47,7 @@ class BaseModel():
     def save(self):
         """Update public instance attribute updated_at with current datetime.
         """
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.today()
         models.storage.save()
 
     def to_dict(self):
