@@ -2,7 +2,7 @@
 # base_mode.py
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import models
 
 
@@ -15,8 +15,8 @@ class BaseModel():
             # datetime.utcnow() has been depracated
             # datetime.now(timezone.utc) - better timezone
             #  - from datetime import timezone
-            self.created_at = datetime.today()
-            self.updated_at = datetime.today()
+            self.created_at = datetime.now(timezone.utc)
+            self.updated_at = datetime.now(timezone.utc)
             '''Add the new when created object'''
             models.storage.new(self)
         else:
@@ -47,7 +47,7 @@ class BaseModel():
     def save(self):
         """Update public instance attribute updated_at with current datetime.
         """
-        self.updated_at = datetime.today()
+        self.updated_at = datetime.now(timezone.utc)
         models.storage.save()
 
     def to_dict(self):
@@ -57,9 +57,10 @@ class BaseModel():
         Returns:
             dict: key/value pairs.
         """
+        time_format = "%Y-%m-%dT%H:%M:%S.%f"
         new_dict = self.__dict__.copy()
         new_dict['__class__'] = self.__class__.__name__
-        new_dict['created_at'] = self.created_at.isoformat()
-        new_dict['updated_at'] = self.updated_at.isoformat()
+        new_dict['created_at'] = self.created_at.strftime(time_format)
+        new_dict['updated_at'] = self.updated_at.strftime(time_format)
 
         return new_dict
