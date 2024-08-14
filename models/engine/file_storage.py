@@ -30,7 +30,7 @@ class FileStorage():
         Returns:
             dict: objects.
         """
-        return self.__objects
+        return FileStorage.__objects
 
     def new(self, obj):
         """Sets in __objects the obj with key <obj class name>.id.
@@ -39,17 +39,17 @@ class FileStorage():
             obj (any): object.
         """
         key = obj.__class__.__name__ + "." + obj.id
-        self.__objects[key] = obj
+        FileStorage.__objects[key] = obj
 
     def save(self):
         """Serializes __objects to the JSON file (path: __file_path).
         """
         dictionary = {}
 
-        for key, value in self.__objects.items():
+        for key, value in FileStorage.__objects.items():
             dictionary[key] = value.to_dict()
 
-        with open(self.__file_path, 'w', encoding="utf-8") as myFile:
+        with open(FileStorage.__file_path, 'w', encoding="utf-8") as myFile:
             json.dump(dictionary, myFile)
 
     def reload(self):
@@ -58,7 +58,7 @@ class FileStorage():
         exist, no exception should be raised)
         """
         try:
-            with open(self.__file_path, 'r', encoding='utf-8') as myFile:
+            with open(FileStorage.__file_path, 'r', encoding='utf-8') as myFile:
                 # my_obj_dump = myFile.read()
                 my_obj_dump = myFile.read()
         except Exception:
@@ -66,14 +66,14 @@ class FileStorage():
         objects = eval(my_obj_dump)
         for (key, value) in objects.items():
             objects[key] = eval(key.split('.')[0] + '(**value)')
-        self.__objects = objects
+        FileStorage.__objects = objects
 
     def delete(self, obj):
         """Deletes obj from __objects
         """
         try:
             key = obj.__class__.__name__ + '.' + str(obj.id)
-            del self.__objects[key]
+            del FileStorage.__objects[key]
             return True
         except Exception:
             return False
